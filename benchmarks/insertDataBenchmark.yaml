@@ -1,5 +1,5 @@
 test:
-    name: evalueate the performance of inserting data using integer vector
+    name: evaluate the performance of inserting data using integer vector
     description: test benchmark
     workers:
       type: local
