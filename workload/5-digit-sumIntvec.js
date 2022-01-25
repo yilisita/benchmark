@@ -2,9 +2,9 @@
 
 const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
 // 数据的位数在这里进行控制
-const BIT = 3;
+const BIT = 5;
 // 要测试的函数在这里进行控制
-const FUNCTION = "InsertData";
+const FUNCTION = "InsertDataIntvec";
 // 使用的用户
 const USER = "User1";
 
@@ -15,17 +15,12 @@ class MyWorkload extends WorkloadModuleBase {
     
     async initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext) {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
-        let sum;
         // assets = 100
         // 数据量要在benchmark中控制
         for (let i=0; i<this.roundArguments.assets; i++) {
             const assetID = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Creating asset ${assetID}`);
-            let n = Math.floor(Math.random() * Math.pow(10, BIT))
-            if (n < Math.pow(10, BIT - 1)){
-                n += Math.pow(10, BIT - 1)
-            }
-            
+            let n = Math.floor(Math.random() * (Math.pow(10, BIT) - Math.pow(10, BIT - 1)) + Math.pow(10, BIT - 1))
+            console.log(`Worker ${this.workerIndex}: Creating asset ${assetID}, n: ${n}`);       
             const request = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: FUNCTION,
@@ -39,10 +34,9 @@ class MyWorkload extends WorkloadModuleBase {
     }
     
     async submitTransaction() {
-        const randomId = Math.floor(Math.random()*this.roundArguments.assets);
         const myArgs = {
             contractId: this.roundArguments.contractId,
-            contractFunction: 'GetSum',
+            contractFunction: 'GetSumIntvec',
             invokerIdentity: USER,
             contractArguments: [],
             readOnly: true
@@ -52,20 +46,17 @@ class MyWorkload extends WorkloadModuleBase {
     }
     
     async cleanupWorkloadModule() {
-        for (let i=0; i<this.roundArguments.assets; i++) {
-            const assetID = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Deleting asset ${assetID}`);
-            const request = {
-                contractId: this.roundArguments.contractId,
-                contractFunction: 'DeleteData',
-                invokerIdentity: USER,
-                contractArguments: [assetID],
-                readOnly: false
-            };
+        const request = {
+            contractId: this.roundArguments.contractId,
+            contractFunction: 'DeleteData',
+            invokerIdentity: USER,
+            contractArguments: [],
+            readOnly: true
+        };
 
-            await this.sutAdapter.sendRequests(request);
-        }
+        await this.sutAdapter.sendRequests(request);
     }
+        
 }
 
 function createWorkloadModule() {

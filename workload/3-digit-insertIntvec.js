@@ -23,19 +23,15 @@ class MyWorkload extends WorkloadModuleBase {
     // 测试插入数据
     async submitTransaction() {
         for (let i=0; i<this.roundArguments.assets; i++) {
-            const assetID = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Creating asset ${assetID}`);
-            let n = Math.floor(Math.random() * Math.pow(10, BIT))
-            if (n < Math.pow(10, BIT - 1)){
-                n += Math.pow(10, BIT - 1)
-            }
-            
+            const assetID = `${this.workerIndex}_${i}`;            
+            let n = Math.floor(Math.random() * (Math.pow(10, BIT) - Math.pow(10, BIT - 1)) + Math.pow(10, BIT - 1))
+            console.log(`Worker ${this.workerIndex}: Creating asset ${assetID}, n: ${n}`);
             const request = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: FUNCTION,
                 invokerIdentity: USER,
                 contractArguments: [assetID, n.toString()],
-                readOnly: false
+                readOnly: true
             };
 
             await this.sutAdapter.sendRequests(request);
@@ -43,19 +39,15 @@ class MyWorkload extends WorkloadModuleBase {
     }
     
     async cleanupWorkloadModule() {
-        for (let i=0; i<this.roundArguments.assets; i++) {
-            const assetID = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Deleting asset ${assetID}`);
-            const request = {
-                contractId: this.roundArguments.contractId,
-                contractFunction: 'DeleteData',
-                invokerIdentity: USER,
-                contractArguments: [assetID],
-                readOnly: false
-            };
+        const request = {
+            contractId: this.roundArguments.contractId,
+            contractFunction: 'DeleteData',
+            invokerIdentity: USER,
+            contractArguments: [],
+            readOnly: true
+        };
 
-            await this.sutAdapter.sendRequests(request);
-        }
+        await this.sutAdapter.sendRequests(request);
     }
 }
 
