@@ -2,7 +2,7 @@
  * @Author: Wen Jiajun
  * @Date: 2022-02-24 14:11:18
  * @LastEditors: Wen Jiajun
- * @LastEditTime: 2022-02-24 14:25:24
+ * @LastEditTime: 2022-02-25 15:38:29
  * @FilePath: \caliper-experiment\workload\readResponse.js
  * @Description: 
  */
@@ -41,29 +41,30 @@ class MyWorkload extends WorkloadModuleBase {
         for (let i=0; i<this.roundArguments.assets; i++) {
             // requestID
             const responseID = `${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Creating request ${requestID}`);
+            console.log(`Worker ${this.workerIndex}: Creating response ${responseID}`);
 
             // parameter generating
             let tableName = `Table_${i}`; // tableName: string
             let attribute = ["ZhuangjiRongliang"]; // attribute []string
             let proposal = `Sum`; // two kinds of services provided
             let requestTime = new Date();
-            let amount = math.random() * 10000;
+            let amount = Math.random() * 10000;
             
-            let response = {
+/*             let response = [{
                 "ID": responseID,
                 "TableName": tableName,
                 "Attribute": attribute,
                 "ProposalStr": proposal,
                 "RequestTime": requestTime,
-                "Amount": amount
-            }
+                "Amount": amount,
+            }] */
+            let response = [{"ID":`${responseID}`,"TableName":"黑龙江省齐齐哈尔供电公司2021年10月","Attribute":["本月发电量"],"Target":"求和","RequestTime":"today","Amount":92353}]
             // construct the request
             const request = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'SendResponse',
                 invokerIdentity: USER,
-                contractArguments: [response.toString()],
+                contractArguments: [JSON.stringify(response)],
                 readOnly: false
             };
 

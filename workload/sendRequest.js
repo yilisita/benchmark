@@ -2,7 +2,7 @@
  * @Author: Wen Jiajun
  * @Date: 2022-01-25 12:06:55
  * @LastEditors: Wen Jiajun
- * @LastEditTime: 2022-02-24 14:33:22
+ * @LastEditTime: 2022-02-25 20:24:20
  * @FilePath: \caliper-experiment\workload\sendRequest.js
  * @Description: 
  */
@@ -39,7 +39,7 @@ class MyWorkload extends WorkloadModuleBase {
 
         // parameter generating
         let tableID = math.floor(math.random() * 100); // suppose we have 100 tables
-        let attributeID = [math.floor(math.random() * 13)]; // suppose we have 13 attributes for each table
+        let attributeID = '['+[Math.floor(Math.random() * 13)].toString()+']'; // suppose we have 13 attributes for each table
         let proposal = math.floor(math.random() * 2); // two kinds of services provided
         let requestTime = new Date();
 

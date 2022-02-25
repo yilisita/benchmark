@@ -1,0 +1,22 @@
+test:
+    name: Electricity Data Sharing System Performance Test
+    description: Test Benchmark
+    workers:
+      type: local
+      number: 2
+    rounds:
+      - label: Handling Request
+        description: Excuting handleRequest() for 20s
+        txDuration: 20
+        rateControl: 
+          type: fixed-load
+          opts:
+            transactionLoad: 2
+        workload:
+          # workload的路径
+          module: workload/handleRequest.js
+          arguments:
+            # 要测试的数据量
+            assets: 100
+            # 链码的名称
+            contractId: private

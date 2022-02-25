@@ -2,7 +2,7 @@
  * @Author: Wen Jiajun
  * @Date: 2022-02-24 14:01:11
  * @LastEditors: Wen Jiajun
- * @LastEditTime: 2022-02-24 14:26:25
+ * @LastEditTime: 2022-02-25 13:15:16
  * @FilePath: \caliper-experiment\workload\handleRequest.js
  * @Description: 
  */
@@ -16,6 +16,9 @@ const SUBMIT_FUNCTION2 = "SendResponse";
 // user identidy
 const USER = "User1";
 
+var assets1 = [];
+var assets2 = [];
+
 
 class MyWorkload extends WorkloadModuleBase {
     constructor() {
@@ -26,14 +29,16 @@ class MyWorkload extends WorkloadModuleBase {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
         // insert some requests for handling
         for (let i=0; i<this.roundArguments.assets; i++) {
+            assets1.push(i)
+            assets2.push(i)
             // requestID
             const requestID = `${this.workerIndex}_${i}`;
             console.log(`Worker ${this.workerIndex}: Creating request ${requestID}`);
 
             // parameter generating
             let tableID = 1; // one table only
-            let attributeID = [math.floor(math.random() * 10)]; // suppose we have 10 attributes for each table
-            let proposal = math.floor(math.random() * 2); // two kinds of services provided
+            let attributeID = '['+[1].toString()+']';; // suppose we have 10 attributes for each table
+            let proposal = 0; // two kinds of services provided
             let requestTime = new Date();
             
             // construct the request
@@ -51,7 +56,14 @@ class MyWorkload extends WorkloadModuleBase {
     
     // Testing HandleSingle() and SendResponse()
     async submitTransaction() {
-        const randomId = Math.floor(Math.random()*this.roundArguments.assets);
+        var randomId
+        if (this.workerIndex == 1){
+            randomId = assets1.pop()
+        }else{
+            randomId = assets2.pop()
+        }
+    	// this statement should be modified to prevent repeating id*****
+        // const randomId = Math.floor(Math.random()*this.roundArguments.assets);
         // construct the request for HandleSingle()
         const request = {
             contractId: this.roundArguments.contractId,
@@ -63,13 +75,20 @@ class MyWorkload extends WorkloadModuleBase {
 
         // Get the response
         let res = await this.sutAdapter.sendRequests(request);
-
+        try{
+            res = res.GetResult().toString();
+        	console.log(res);
+        }catch(e){
+        	console.log(e);
+        }
+	
+	
         // construct the request for SendResponse()
         const request2 = {
             contractId: this.roundArguments.contractId,
             contractFunction: SUBMIT_FUNCTION2,
             invokerIdentity: USER,
-            contractArguments: [res.toString()],
+            contractArguments: [res],
             readOnly: false,
         }
         await this.sutAdapter.sendRequests(request2);
@@ -107,4 +126,3 @@ function createWorkloadModule() {
 }
 
 module.exports.createWorkloadModule = createWorkloadModule;
-
